@@ -3,6 +3,12 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const User = require("../models/user");
 
+const crypto = require("crypto");
+
+const generateRandomPassword = () => {
+  return crypto.randomBytes(9).toString("base64url");
+};
+
 let transport = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -13,7 +19,7 @@ let transport = nodemailer.createTransport({
 
 const signup = async (req, res) => {
   try {
-    let { name, email, password } = req.body;
+    let { name, email, password, role } = req.body;
 
     let existUser = await User.findOne({ email });
 
@@ -27,6 +33,7 @@ const signup = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      role,
     });
 
     res.send({ status: true, message: "User Creasted Successfuly" });
@@ -39,7 +46,7 @@ const login = async (req, res) => {
   try {
     let { email, password } = req.body;
 
-    let verifyUser = await User.findOne({ email });
+    let verifyUser = await User.findOne({ email }).populate("role");
 
     if (!verifyUser) {
       return res.send({ status: false, message: "User Not Found" });
@@ -58,7 +65,18 @@ const login = async (req, res) => {
     );
 
     console.log(token);
-    res.send({ status: true, message: "Valid Password", token });
+    res.send({
+      status: true,
+      message: "Valid Password",
+      token,
+      user: {
+        id: verifyUser._id,
+        name: verifyUser.name,
+        email: verifyUser.email,
+        roleName: verifyUser.role?.name,
+        permissions: verifyUser.role?.permissions || [], // 👈 UI buttons show/hide karne ke liye
+      },
+    });
   } catch (error) {
     console.log(error);
   }
@@ -139,7 +157,7 @@ const reset = async (req, res) => {
 
 const add = async (req, res) => {
   try {
-    let { name, email, phone, address } = req.body;
+    let { name, email, phone, address, role } = req.body;
 
     let findUser = await User.findOne({ email });
 
@@ -147,11 +165,28 @@ const add = async (req, res) => {
       return res.send({ status: false, message: "User Already Exist" });
     }
 
+    const randomPassword = generateRandomPassword();
+
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
     let createUser = await User.create({
       name,
       email,
+      password: hashedPassword,
       phone,
       address,
+      role,
+      status: "Active",
+    });
+
+    await transport.sendMail({
+      from: process.env.GMAIL_USER,
+      to: email,
+      subject: "Your Account Has Been Created",
+      text: `Hello ${name} Your account has been created successfully.
+Login Email: ${email}
+Temporary Password: ${randomPassword}
+Please log in and change your password immediately.`,
     });
 
     return res.send({
@@ -168,7 +203,7 @@ const update = async (req, res) => {
   try {
     let { id } = req.params;
 
-    let { name, email, phone, address, status } = req.body;
+    let { name, email, phone, address, status, role } = req.body;
 
     let findUser = await User.findOne({ _id: id });
 
@@ -181,6 +216,7 @@ const update = async (req, res) => {
     findUser.phone = phone;
     findUser.address = address;
     findUser.status = status;
+    findUser.role = role;
 
     const updateUser = await findUser.save();
 
@@ -196,7 +232,7 @@ const update = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const user = await User.find().sort({ createdAt: -1 });
+    const user = await User.find().populate("role").sort({ createdAt: -1 });
     return res.send({ status: true, message: "All User Found", user });
   } catch (error) {
     console.log(error);

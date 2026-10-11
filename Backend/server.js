@@ -10,6 +10,8 @@ const mongoose = require("./db/db");
 // const userRoutes = require("./routes/userRoute");
 const adminRoutes = require("./routes/adminRoute");
 const categoryRoutes = require("./routes/category");
+const subcategoryRoutes = require("./routes/subcategoryRoute");
+const rolescateoryRoutes = require("./routes/rolesRoute");
 const fileupload = require("express-fileupload");
 
 const app = express();
@@ -32,6 +34,8 @@ app.use((req, res, next) => {
 // app.use("/user", userRoutes);
 app.use("/admin", adminRoutes);
 app.use("/category", categoryRoutes);
+app.use("/subcategory", subcategoryRoutes);
+app.use("/roles", rolescateoryRoutes);
 
 app.listen(5000, () => {
   console.log("Server Running");

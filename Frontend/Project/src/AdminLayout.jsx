@@ -168,10 +168,10 @@ const AdminLayout = () => {
               )}
             </NavLink>
 
-            {/* Inventory */}
+            {/* Role */}
 
             <NavLink
-              to="/inventory"
+              to="/role"
               className="group flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-200"
             >
               {({ isActive }) => (
@@ -181,7 +181,7 @@ const AdminLayout = () => {
                     className={isActive ? "text-indigo-600" : "text-slate-400"}
                   />
 
-                  <span className="text-sm font-medium">Inventory</span>
+                  <span className="text-sm font-medium">Role</span>
                 </>
               )}
             </NavLink>

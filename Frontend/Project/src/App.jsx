@@ -12,6 +12,7 @@ import User from "./User";
 import AdminLayout from "./AdminLayout";
 import Category from "./Category";
 import SubCategory from "./SubCategory";
+import Roles from "./Roles";
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
           <Route path="/user" element={<User />} />
           <Route path="/category" element={<Category />} />
           <Route path="/sub-category" element={<SubCategory />} />
+          <Route path="/role" element={<Roles />} />
         </Route>
       </Routes>
       <ToastContainer position="top-right" autoClose={5000} />

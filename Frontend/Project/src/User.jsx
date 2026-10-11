@@ -24,6 +24,10 @@ const UserBody = () => {
 
   const [users, setUsers] = useState([]);
 
+  // ================== ROLE STATE ===============
+
+  const [roles, setRoles] = useState([]);
+
   // ================= SEARCH =================
 
   const [search, setSearch] = useState("");
@@ -41,6 +45,7 @@ const UserBody = () => {
     email: "",
     phone: "",
     address: "",
+    role: "",
     status: "Active",
   });
 
@@ -63,6 +68,7 @@ const UserBody = () => {
       email: "",
       phone: "",
       address: "",
+      role: "",
       status: "Active",
     });
   };
@@ -85,6 +91,7 @@ const UserBody = () => {
       email: user.email || "",
       phone: user.phone || "",
       address: user.address || "",
+      role: user.role?._id || user.role || "",
       status: user.status || "Active",
     });
 
@@ -142,16 +149,19 @@ const UserBody = () => {
 
       console.log("Add User:", form);
 
+      console.log("User form data:", form);
+      console.log("Selected role ID:", form.role);
+
       if (response.data.status) {
         setUsers((prev) => [response.data.user, ...prev]);
         toast.success(response.data.message);
+        closeModal();
       } else {
         toast.error(response.data.message);
       }
-
-      closeModal();
     } catch (error) {
       console.log(error);
+      toast.error(error.response?.data?.message || "Failed to create user");
     }
   };
 
@@ -212,8 +222,29 @@ const UserBody = () => {
     }
   };
 
+  const getRoles = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        "http://localhost:5000/roles/getallRoles", // 👈 Roles API endpoint
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.data.status) {
+        setRoles(response.data.roles || response.data.role || []);
+      }
+    } catch (error) {
+      console.log("Error fetching roles:", error);
+    }
+  };
+
   useEffect(() => {
     getUser();
+    getRoles();
   }, []);
 
   const handleStatusChange = async () => {
@@ -702,6 +733,33 @@ const UserBody = () => {
                     required
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none text-sm resize-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
                   />
+                </div>
+
+                {/* Role */}
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Select Role
+                  </label>
+
+                  <select
+                    name="role"
+                    value={form.role}
+                    onChange={handleChange}
+                    required
+                    className="w-full h-11 px-4 rounded-xl border border-slate-200 bg-white outline-none text-sm text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+                  >
+                    <option value="">Choose a role</option>
+
+                    {roles.map((role) => (
+                      <option
+                        key={role._id || role.id}
+                        value={role._id || role.id}
+                      >
+                        {role.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

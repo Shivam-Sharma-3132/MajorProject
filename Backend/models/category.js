@@ -4,10 +4,12 @@ let categorySchema = mongoose.Schema(
   {
     name: {
       type: String,
+      unique: true,
       required: true,
     },
     slug: {
       type: String,
+      unique: true,
       required: true,
     },
     description: {

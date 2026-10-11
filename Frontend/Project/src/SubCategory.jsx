@@ -23,6 +23,10 @@ const SubCategory = () => {
 
   const [categories, setCategories] = useState([]);
 
+  // ================== PARENT CATEGORY =============
+
+  const [parentCategories, setParentCategories] = useState([]);
+
   // ================= SEARCH =================
 
   const [search, setSearch] = useState("");
@@ -40,7 +44,6 @@ const SubCategory = () => {
 
   const [form, setForm] = useState({
     name: "",
-    slug: "",
     description: "",
     image: null,
     status: "Active",
@@ -78,7 +81,6 @@ const SubCategory = () => {
   const resetForm = () => {
     setForm({
       name: "",
-      slug: "",
       description: "",
       image: null,
       status: "Active",
@@ -103,7 +105,6 @@ const SubCategory = () => {
 
     setForm({
       name: category.name || "",
-      slug: category.slug || "",
       description: category.description || "",
       image: null,
       status: category.status || "Active",
@@ -162,7 +163,6 @@ const SubCategory = () => {
       const formData = new FormData();
 
       formData.append("name", form.name);
-      formData.append("slug", form.slug);
       formData.append("description", form.description);
       formData.append("status", form.status);
       formData.append("parentCategory", form.parentCategory);
@@ -172,17 +172,17 @@ const SubCategory = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:5000/category/add",
+        "http://localhost:5000/subcategory/subAdd",
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
+        // {
+        //   headers: {
+        //     "Content-Type": "multipart/form-data",
+        //   },
+        // },
       );
 
       if (response.data.status) {
-        setCategories((prev) => [...prev, response.data.category]);
+        setCategories((prev) => [response.data.subcategory, ...prev]);
 
         toast.success(
           response.data.message || "Sub-category added successfully",
@@ -208,7 +208,6 @@ const SubCategory = () => {
       const formData = new FormData();
 
       formData.append("name", form.name);
-      formData.append("slug", form.slug);
       formData.append("description", form.description);
       formData.append("status", form.status);
       formData.append("parentCategory", form.parentCategory);
@@ -218,20 +217,20 @@ const SubCategory = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:5000/category/update/${selectedCategory._id}`,
+        `http://localhost:5000/subcategory/subUpdate/${selectedCategory._id}`,
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
+        // {
+        //   headers: {
+        //     "Content-Type": "multipart/form-data",
+        //   },
+        // },
       );
 
       if (response.data.status) {
         setCategories((prev) =>
           prev.map((category) =>
             category._id === selectedCategory._id
-              ? response.data.category
+              ? response.data.subcategory
               : category,
           ),
         );
@@ -256,11 +255,11 @@ const SubCategory = () => {
   const getCategories = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/category/getallCategories",
+        "http://localhost:5000/subcategory/subGetallCategories",
       );
 
       if (response.data.status) {
-        setCategories(response.data.category || []);
+        setCategories(response.data.subcategory || []);
       } else {
         toast.error(response.data.message || "Failed to fetch sub-categories");
       }
@@ -277,7 +276,31 @@ const SubCategory = () => {
 
   useEffect(() => {
     getCategories();
+    getParentCategories();
   }, []);
+
+  // ============== GET PARENT CATEGORY ===============
+
+  const getParentCategories = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/category/getallCategories",
+      );
+
+      if (response.data.status) {
+        setParentCategories(response.data.category || []);
+      } else {
+        toast.error(
+          response.data.message || "Failed to fetch parent categories",
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error.response?.data?.message || "Failed to fetch parent categories",
+      );
+    }
+  };
 
   // ================= STATUS CHANGE =================
 
@@ -287,7 +310,7 @@ const SubCategory = () => {
         selectedCategory.status === "Active" ? "Inactive" : "Active";
 
       const response = await axios.patch(
-        `http://localhost:5000/category/status/${selectedCategory._id}`,
+        `http://localhost:5000/subcategory/subStatus/${selectedCategory._id}`,
         {
           status: newStatus,
         },
@@ -297,7 +320,7 @@ const SubCategory = () => {
         setCategories((prev) =>
           prev.map((category) =>
             category._id === selectedCategory._id
-              ? response.data.category
+              ? response.data.subcategory
               : category,
           ),
         );
@@ -320,7 +343,7 @@ const SubCategory = () => {
   const handleDeleteCategory = async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/category/deleteCategory/${selectedCategory._id}`,
+        `http://localhost:5000/subcategory/subDeleteCategory/${selectedCategory._id}`,
       );
 
       if (response.data.status) {
@@ -741,15 +764,21 @@ const SubCategory = () => {
                     Parent Category
                   </label>
 
-                  <input
-                    type="text"
+                  <select
                     name="parentCategory"
                     value={form.parentCategory}
                     onChange={handleChange}
-                    placeholder="Enter parent category ID"
                     required
-                    className="w-full h-11 px-4 rounded-xl border border-slate-200 outline-none text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
-                  />
+                    className="w-full h-11 px-4 rounded-xl border border-slate-200 bg-white outline-none text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+                  >
+                    <option value="">Select Parent Category</option>
+
+                    {parentCategories.map((category) => (
+                      <option key={category._id} value={category._id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Name */}
@@ -768,31 +797,6 @@ const SubCategory = () => {
                     required
                     className="w-full h-11 px-4 rounded-xl border border-slate-200 outline-none text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
                   />
-                </div>
-
-                {/* Slug */}
-
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Slug
-                  </label>
-
-                  <div className="relative">
-                    <LinkIcon
-                      size={17}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                    />
-
-                    <input
-                      type="text"
-                      name="slug"
-                      value={form.slug}
-                      onChange={handleChange}
-                      placeholder="sub-category-slug"
-                      required
-                      className="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 outline-none text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
-                    />
-                  </div>
                 </div>
 
                 {/* Description */}
@@ -911,7 +915,7 @@ const SubCategory = () => {
 
       {modal === "view" && selectedCategory && (
         <div className="fixed inset-0 z-[100] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <div className="w-full max-w-md max-h-[100vh] bg-white rounded-2xl shadow-2xl overflow-hidden">
             {/* HEADER */}
 
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">

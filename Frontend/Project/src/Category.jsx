@@ -13,7 +13,7 @@ import {
   AlertTriangle,
   Image as ImageIcon,
   FileText,
-  Link as LinkIcon,
+  LinkIcon,
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -40,7 +40,6 @@ const Category = () => {
 
   const [form, setForm] = useState({
     name: "",
-    slug: "",
     description: "",
     image: null,
     status: "Active",
@@ -77,7 +76,6 @@ const Category = () => {
   const resetForm = () => {
     setForm({
       name: "",
-      slug: "",
       description: "",
       image: null,
       status: "Active",
@@ -101,7 +99,6 @@ const Category = () => {
 
     setForm({
       name: category.name || "",
-      slug: category.slug || "",
       description: category.description || "",
       image: null,
       status: category.status || "Active",
@@ -155,7 +152,6 @@ const Category = () => {
       const formData = new FormData();
 
       formData.append("name", form.name);
-      formData.append("slug", form.slug);
       formData.append("description", form.description);
       formData.append("status", form.status);
 
@@ -167,7 +163,7 @@ const Category = () => {
       }
 
       console.log(formData);
-      return;
+      // return;
       const response = await axios.post(
         "http://localhost:5000/category/add",
         formData,
@@ -179,7 +175,7 @@ const Category = () => {
       );
 
       if (response.data.status) {
-        setCategories((prev) => [...prev, response.data.category]);
+        setCategories((prev) => [response.data.category, ...prev]);
 
         toast.success(response.data.message || "Category added successfully");
 
@@ -207,7 +203,6 @@ const Category = () => {
       const formData = new FormData();
 
       formData.append("name", form.name);
-      formData.append("slug", form.slug);
       formData.append("description", form.description);
       formData.append("status", form.status);
 
@@ -720,31 +715,6 @@ const Category = () => {
                     required
                     className="w-full h-11 px-4 rounded-xl border border-slate-200 outline-none text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
                   />
-                </div>
-
-                {/* SLUG */}
-
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Slug
-                  </label>
-
-                  <div className="relative">
-                    <LinkIcon
-                      size={17}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                    />
-
-                    <input
-                      type="text"
-                      name="slug"
-                      value={form.slug}
-                      onChange={handleChange}
-                      placeholder="category-slug"
-                      required
-                      className="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 outline-none text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
-                    />
-                  </div>
                 </div>
 
                 {/* DESCRIPTION */}

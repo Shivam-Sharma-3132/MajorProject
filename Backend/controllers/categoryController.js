@@ -10,12 +10,22 @@ const Category = require("../models/category");
 //   api_key: process.env.API_KEY,
 //   api_secret: process.env.API_SECRET,
 // });
+
+const generateSlug = (name) => {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+};
+
 const add = async (req, res) => {
   try {
-    let { name, slug, description, status } = req.body;
+    let { name, description, status } = req.body;
 
-    console.log("acb");
-    if (!name || !slug || !description || !status) {
+    // console.log("acb");
+    if (!name || !description || !status) {
       return res.send({ status: false, message: "All fields are required" });
     }
 
@@ -25,6 +35,17 @@ const add = async (req, res) => {
       return res.send({ status: false, message: "Image is Required" });
     }
 
+    const slug = generateSlug(name);
+
+    const existingCategory = await Category.findOne({ slug });
+
+    if (existingCategory) {
+      return res.send({
+        status: false,
+        message: "A category with this name is already exist",
+      });
+    }
+
     const uploadImage = await cloudinary.uploader.upload(file.tempFilePath, {
       folder: "Second",
     });
@@ -32,7 +53,7 @@ const add = async (req, res) => {
     console.log(uploadImage.url);
 
     const category = await Category.create({
-      name,
+      name: name.trim(),
       slug,
       description,
       status,
@@ -49,13 +70,15 @@ const add = async (req, res) => {
 const update = async (req, res) => {
   try {
     let { id } = req.params;
-    const { name, slug, description, status } = req.body;
+    const { name, description, status } = req.body;
 
     const category = await Category.findOne({ _id: id });
 
     if (!category) {
       return res.send({ status: false, message: "User Not Found" });
     }
+
+    const slug = generateSlug(name);
 
     category.name = name;
     category.slug = slug;
@@ -71,9 +94,14 @@ const update = async (req, res) => {
     }
 
     await category.save();
-    return res.send({ status: true, message: "Category Updated Successfully" });
+    return res.send({
+      status: true,
+      message: "Category Updated Successfully",
+      category,
+    });
   } catch (error) {
     console.log(error);
+    res.send({ message: error });
   }
 };
 

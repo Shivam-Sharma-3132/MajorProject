@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("./models/user");
 
 const auth = async (req, res, next) => {
   try {
@@ -20,6 +21,18 @@ const auth = async (req, res, next) => {
       res.send({ status: false, message: "Invalid Token" });
     }
 
+    const user = await User.findById(decodeToken.id).populate("role");
+
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    if (user.status === "Inactive") {
+      return res
+        .status(403)
+        .json({ status: false, message: "Account is inactive" });
+    }
+    req.user = user;
     next();
   } catch (error) {
     console.log(error);

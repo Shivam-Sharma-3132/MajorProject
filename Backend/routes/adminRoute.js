@@ -4,6 +4,7 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const auth = require("../auth");
+const checkPermission = require("../checkPermission");
 const {
   signup,
   login,
@@ -32,16 +33,21 @@ router.post("/reset", reset);
 
 // USER ADD USING ADMINLAYOUT
 
-router.post("/add", auth, add);
+router.post("/add", auth, checkPermission("users_add"), add);
 
-router.put("/update/:id", auth, update);
+router.put("/update/:id", auth, checkPermission("users_update"), update);
 
-router.get("/getallUsers", auth, getAll);
+router.get("/getallUsers", auth, checkPermission("users_read"), getAll);
 
-router.patch("/status/:id", auth, status);
+router.patch("/status/:id", auth, checkPermission("users_update"), status);
 
 router.post("/verify", auth, verify);
 
-router.delete("/deleteUser/:id", auth, deleteUser);
+router.delete(
+  "/deleteUser/:id",
+  auth,
+  checkPermission("users_delete"),
+  deleteUser,
+);
 
 module.exports = router;
