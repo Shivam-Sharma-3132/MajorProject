@@ -33,6 +33,7 @@ const MODULES = [
   { key: "users", label: "Users" },
   { key: "category", label: "Category" },
   { key: "subcategory", label: "SubCategory" },
+  { key: "roles", label: "Roles" },
 ];
 
 const ACTIONS = [

@@ -18,8 +18,11 @@ const checkPermission = (requiredPermission) => {
       const userPermissions = (role.permissions || []).map((permission) =>
         String(permission).toLowerCase(),
       );
-      const hasPermission = userPermissions.includes(
-        requiredPermission.toLowerCase(),
+      const requiredPermissions = Array.isArray(requiredPermission)
+        ? requiredPermission
+        : [requiredPermission];
+      const hasPermission = requiredPermissions.some((permission) =>
+        userPermissions.includes(String(permission).toLowerCase()),
       );
 
       if (!hasPermission) {

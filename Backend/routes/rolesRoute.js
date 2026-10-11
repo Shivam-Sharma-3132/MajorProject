@@ -18,7 +18,12 @@ router.put(
   checkPermission("roles_update"),
   updateRole,
 );
-router.get("/getallRoles", auth, checkPermission("roles_read"), getallRoles);
+router.get(
+  "/getallRoles",
+  auth,
+  checkPermission(["roles_read", "users_add", "users_update"]),
+  getallRoles,
+);
 router.patch(
   "/statusRole/:id",
   auth,
