@@ -174,11 +174,11 @@ const SubCategory = () => {
       const response = await axios.post(
         "http://localhost:5000/subcategory/subAdd",
         formData,
-        // {
-        //   headers: {
-        //     "Content-Type": "multipart/form-data",
-        //   },
-        // },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (response.data.status) {
@@ -219,11 +219,11 @@ const SubCategory = () => {
       const response = await axios.put(
         `http://localhost:5000/subcategory/subUpdate/${selectedCategory._id}`,
         formData,
-        // {
-        //   headers: {
-        //     "Content-Type": "multipart/form-data",
-        //   },
-        // },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (response.data.status) {
@@ -256,6 +256,11 @@ const SubCategory = () => {
     try {
       const response = await axios.get(
         "http://localhost:5000/subcategory/subGetallCategories",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (response.data.status) {
@@ -285,6 +290,11 @@ const SubCategory = () => {
     try {
       const response = await axios.get(
         "http://localhost:5000/category/getallCategories",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (response.data.status) {
@@ -313,6 +323,11 @@ const SubCategory = () => {
         `http://localhost:5000/subcategory/subStatus/${selectedCategory._id}`,
         {
           status: newStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         },
       );
 
@@ -344,6 +359,11 @@ const SubCategory = () => {
     try {
       const response = await axios.delete(
         `http://localhost:5000/subcategory/subDeleteCategory/${selectedCategory._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (response.data.status) {

@@ -162,16 +162,14 @@ const Category = () => {
         return;
       }
 
-      console.log(formData);
-      // return;
       const response = await axios.post(
         "http://localhost:5000/category/add",
         formData,
-        // {
-        //   headers: {
-        //     "Content-Type": "multipart/form-data",
-        //   },
-        // },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (response.data.status) {
@@ -213,11 +211,11 @@ const Category = () => {
       const response = await axios.put(
         `http://localhost:5000/category/update/${selectedCategory._id}`,
         formData,
-        // {
-        //   headers: {
-        //     "Content-Type": "multipart/form-data",
-        //   },
-        // },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (response.data.status) {
@@ -248,6 +246,11 @@ const Category = () => {
     try {
       const response = await axios.get(
         "http://localhost:5000/category/getallCategories",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (response.data.status) {
@@ -282,6 +285,11 @@ const Category = () => {
         {
           status: newStatus,
         },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (response.data.status) {
@@ -312,6 +320,11 @@ const Category = () => {
     try {
       const response = await axios.delete(
         `http://localhost:5000/category/deleteCategory/${selectedCategory._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (response.data.status) {

@@ -5,22 +5,17 @@ const auth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-      return res.send({ status: false, message: "Token not found" });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ status: false, message: "Token not found" });
     }
 
-    let token = authHeader.split(" ")[1];
+    const token = authHeader.slice("Bearer ".length).trim();
 
     if (!token) {
-      return res.send({ status: false, message: "Token Missing" });
+      return res.status(401).json({ status: false, message: "Token missing" });
     }
 
-    let decodeToken = await jwt.verify(token, "MySecretKey");
-
-    if (!decodeToken) {
-      res.send({ status: false, message: "Invalid Token" });
-    }
-
+    const decodeToken = jwt.verify(token, "MySecretKey");
     const user = await User.findById(decodeToken.id).populate("role");
 
     if (!user) {

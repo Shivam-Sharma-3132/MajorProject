@@ -14,18 +14,18 @@ const {
 const router = express.Router();
 
 router.post("/add", auth, checkPermission("category_add"), add);
-router.put("/update/:id", auth, checkPermission("category_add"), update);
+router.put("/update/:id", auth, checkPermission("category_update"), update);
 router.get(
   "/getallCategories",
   auth,
-  checkPermission("category_add"),
+  checkPermission("category_read"),
   getallCategories,
 );
-router.patch("/status/:id", auth, checkPermission("category_add"), status);
+router.patch("/status/:id", auth, checkPermission("category_update"), status);
 router.delete(
   "/deleteCategory/:id",
   auth,
-  checkPermission("category_add"),
+  checkPermission("category_delete"),
   deleteCategory,
 );
 

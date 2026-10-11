@@ -1,23 +1,23 @@
-const User = require("./models/user");
-
 const checkPermission = (requiredPermission) => {
   return (req, res, next) => {
     try {
       const user = req.user;
+      const role = user?.role;
 
-      if (!user || !user.role) {
+      if (!role || role.status === "INACTIVE") {
         return res.status(403).json({
           status: false,
-          message: "Forbidden: No role assigned",
+          message: "Forbidden: No active role assigned",
         });
       }
 
-      // SUPER_ADMIN ke paas bypass access de sakte hain
-      if (user.role.name === "SUPER_ADMIN") {
+      if (role.name === "SUPER_ADMIN") {
         return next();
       }
 
-      const userPermissions = user.role.permissions || [];
+      const userPermissions = (role.permissions || []).map((permission) =>
+        String(permission).toLowerCase(),
+      );
       const hasPermission = userPermissions.includes(
         requiredPermission.toLowerCase(),
       );

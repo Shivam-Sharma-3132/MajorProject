@@ -12,24 +12,29 @@ const {
 
 const router = express.Router();
 
-router.post("/subAdd", auth, checkPermission("category_add"), subAdd);
-router.put("/subUpdate/:id", auth, checkPermission("category_add"), subUpdate);
+router.post("/subAdd", auth, checkPermission("subcategory_add"), subAdd);
+router.put(
+  "/subUpdate/:id",
+  auth,
+  checkPermission("subcategory_update"),
+  subUpdate,
+);
 router.get(
   "/subGetallCategories",
   auth,
-  checkPermission("category_add"),
+  checkPermission("subcategory_read"),
   subGetallCategories,
 );
 router.patch(
   "/subStatus/:id",
   auth,
-  checkPermission("category_add"),
+  checkPermission("subcategory_update"),
   subStatus,
 );
 router.delete(
   "/subDeleteCategory/:id",
   auth,
-  checkPermission("category_add"),
+  checkPermission("subcategory_delete"),
   subDeleteCategory,
 );
 
